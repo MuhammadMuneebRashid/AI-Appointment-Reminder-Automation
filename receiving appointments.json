@@ -1,0 +1,261 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6f25037f-520e-4f9f-84a3-1e769e9e4494",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1f2432c7-be53-458c-9184-8ff7f6e89076",
+      "name": "Webhook",
+      "webhookId": "6f25037f-520e-4f9f-84a3-1e769e9e4494"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fields=$input.first().json.body.data.fields\nconst f1=fields.find(f=>f.label===\"Full Name:\")\nconst name=f1.value;\nconst f2=fields.find(f=>f.label===\"Email:\")\nconst email=f2.value;\nconst f3=fields.find(f=>f.label===\"Phone :\")\nconst phone=f3.value;\nconst f4=fields.find(f=>f.label===\"Appointment Date:\")\nconst appointment_date=f4.value;\nconst f5=fields.find(f=>f.label===\"Appointment time:\")\nconst appointment_time=f5.value;\nconst f6=fields.find(f=>f.label===\"Duration:\")\nconst duration=f6.value;\nconst f7=fields.find(f=>f.label=== \"Service\")\nconst value=f7.value[0];\nconst options=f7.options.find(f=>f.id===value)\nconst service=options.text;\nreturn[{\n  name,\n  email,\n  phone,\n  appointment_date,\n  appointment_time,\n  duration,\n  service\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "c181785a-16f1-4a4b-9779-b13b105c3f31",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b387ff3b-8f56-4857-a537-891eacdec4c7",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "db1d63f7-0719-4b9d-b034-50b2610f9cdb",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "404e0fe3-5a50-4751-b542-580d51ada964",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "6882073e-56e1-460e-bf48-503b9a5ad101",
+              "name": "appointment_date",
+              "value": "={{ $json.appointment_date }}",
+              "type": "string"
+            },
+            {
+              "id": "8b9742c1-309a-433c-bf4c-289e6b1f1fd2",
+              "name": "appointment_time",
+              "value": "={{ $json.appointment_time }}",
+              "type": "string"
+            },
+            {
+              "id": "bf06c027-77e9-49e9-921b-dbc9c962da88",
+              "name": "duration",
+              "value": "={{ $json.duration }}",
+              "type": "string"
+            },
+            {
+              "id": "e3652030-b27e-41c2-8b2b-dfff73d16d81",
+              "name": "service",
+              "value": "={{ $json.service }}",
+              "type": "string"
+            },
+            {
+              "id": "414d705a-4c05-4ae2-b6b8-c5eceaf36c8d",
+              "name": "status",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "ed1e8992-354b-407a-ad01-5a9455041f72",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ivJJz3qhk_7i2X8iqBxQkL2Iih4kgugWJvnrGI2mLoQ",
+          "mode": "list",
+          "cachedResultName": "appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ivJJz3qhk_7i2X8iqBxQkL2Iih4kgugWJvnrGI2mLoQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ivJJz3qhk_7i2X8iqBxQkL2Iih4kgugWJvnrGI2mLoQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "appointment_date",
+              "displayName": "appointment_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "appointment_time",
+              "displayName": "appointment_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "duration",
+              "displayName": "duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        0
+      ],
+      "id": "95c32e95-3267-4ed8-bea7-b42d0ceedc78",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5oUSOxY12bC92ffE",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "30e0853616f6641ec1ad249f674906b0f714df3394e8312a431b5e7cfb963b65"
+  }
+}
