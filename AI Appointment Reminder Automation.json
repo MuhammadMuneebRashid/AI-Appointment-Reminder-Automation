@@ -54,7 +54,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const a = item.json;\n\n  return {\n    json: {\n      name: a.name,\n      email: a.email,\n      appointment_date: a.appointment_date,\n      appointment_time: a.appointment_time,\n      service: a.service,\n      status: a.status,\n      test: \"Appointment received successfully\"\n    }\n  };\n});"
+        "jsCode": "const currentTime = new Date();\n\nreturn items.filter(item => {\n  const [day, month, year] = item.json.appointment_date.split('-').map(Number);\n  const [hour, minute] = item.json.appointment_time.split(':').map(Number);\n\n  const appointmentTime = Date.UTC(\n    year,\n    month - 1,\n    day,\n    hour - 5,\n    minute\n  );\n\n  const hoursLeft =\n    (appointmentTime - currentTime.getTime()) / 3600000;\n\n  return hoursLeft >= 23.5 && hoursLeft <= 24.5;\n});\n "
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -68,7 +68,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ $json.appointments_data }}\n",
+        "text": "=write a reminder mail with subject to customer also accordning to service write service in small letters {{ $json.name }}{{ $json.email }}{{ $json.phone }}{{ $json.appointment_date }}{{ $json.appointment_time }}{{ $json.duration }}service{{ $json.service }}row number\n{{ $json.row_number }}\n",
         "hasOutputParser": true,
         "options": {}
       },
@@ -93,16 +93,11 @@
       ],
       "id": "981fd3da-3eba-4fe9-818c-e32437856834",
       "name": "Google Gemini Chat Model",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "Khug6Oq5EeMDvXzc",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
+      "credentials": {}
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \n}"
+        "jsonSchemaExample": "{\n  \"row_number\":\"\",\n  \"service\":\"\",\n  \"subject\":\"\",\n  \"mail\":\"\"\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
@@ -112,6 +107,535 @@
       ],
       "id": "48d21e98-1d5e-4663-b537-195fb422fdd8",
       "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.service }}",
+                    "rightValue": "followup",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "63016734-386f-405c-88b6-45fd0aef08d2"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cfd21815-048a-4c13-977f-36c8dad76bb7",
+                    "leftValue": "={{ $json.service }}",
+                    "rightValue": "demo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6d0e16f5-8fc3-442c-bf14-42764e5853cd",
+                    "leftValue": "={{ $json.service }}",
+                    "rightValue": "Consultation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4caa6294-54f9-434e-bb4b-31c116dd05ff",
+                    "leftValue": "={{ $json.service }}",
+                    "rightValue": "meeting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        -32
+      ],
+      "id": "9004200e-8710-4d90-b65e-c55f1757c650",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ea9e28ad-3f13-4ae9-921f-77ea400d082c",
+              "name": "name",
+              "value": "={{ $('Code in JavaScript').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "b6519ef1-a1b8-4f5a-a26e-fe8c9da16ea1",
+              "name": "email",
+              "value": "={{ $('Code in JavaScript').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "6a96bd83-84ae-4470-a993-d679af524447",
+              "name": "phone",
+              "value": "={{ $('Code in JavaScript').item.json.phone }}",
+              "type": "number"
+            },
+            {
+              "id": "a330b162-b424-494d-b7a8-da3ef5db27ee",
+              "name": "appointment_date",
+              "value": "={{ $('Code in JavaScript').item.json.appointment_date }}",
+              "type": "string"
+            },
+            {
+              "id": "79a596f4-66fe-4917-8180-3273721e560f",
+              "name": "appointment_time",
+              "value": "={{ $('Code in JavaScript').item.json.appointment_time }}",
+              "type": "string"
+            },
+            {
+              "id": "14788db0-28ac-4b38-8189-2d8b6ce6f505",
+              "name": "duration",
+              "value": "={{ $('Code in JavaScript').item.json.duration }}",
+              "type": "string"
+            },
+            {
+              "id": "7cf5716d-f69f-46b2-a7a4-fce86e7f52f6",
+              "name": "service",
+              "value": "={{ $('Code in JavaScript').item.json.service }}",
+              "type": "string"
+            },
+            {
+              "id": "a713eca2-15c8-42cc-8daa-021e0300cb53",
+              "name": "subject",
+              "value": "={{ $json.output.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "bc92a95b-b561-42fd-a5b4-70da0d60659e",
+              "name": "mail",
+              "value": "={{ $json.output.mail }}",
+              "type": "string"
+            },
+            {
+              "id": "ff0766c5-4a13-4249-8d3f-fb09407cabb2",
+              "name": "row_number",
+              "value": "={{ $json.output.row_number }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "0725ed8f-5369-4cd1-8ae0-540103aeddd0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1vASAOBseHmmzjXK1cMzlpBrs-LaR4vj7-e5c4etmD0c",
+          "mode": "list",
+          "cachedResultName": "reminder",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vASAOBseHmmzjXK1cMzlpBrs-LaR4vj7-e5c4etmD0c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vASAOBseHmmzjXK1cMzlpBrs-LaR4vj7-e5c4etmD0c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "appointment_date",
+              "displayName": "appointment_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "appointment_time",
+              "displayName": "appointment_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "duration",
+              "displayName": "duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "eb9758f2-e8a4-4337-a698-9c33f68ff7e6",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5oUSOxY12bC92ffE",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.mail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        -240
+      ],
+      "id": "0407294c-5a38-4be9-ac44-d90a37ea82da",
+      "name": "Send a message",
+      "webhookId": "88b79006-09e2-4d0b-9297-17af4cbfdb03",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nxAKRSVmapWrpdol",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.mail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        -64
+      ],
+      "id": "c93de29f-00cc-4849-bc96-f8d3d4d6004f",
+      "name": "Send a message1",
+      "webhookId": "e3b98212-0254-4b58-bbb5-bf03d51ada9c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nxAKRSVmapWrpdol",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.mail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        128
+      ],
+      "id": "7c274ac9-a38b-4ff4-9c87-11c281fd384f",
+      "name": "Send a message2",
+      "webhookId": "ec868be8-5d0e-43d8-ad64-5f459d1228b8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nxAKRSVmapWrpdol",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.mail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        304
+      ],
+      "id": "389e2f44-4b9b-41a1-9708-6ed7d91afa46",
+      "name": "Send a message3",
+      "webhookId": "8089d9e4-ffa8-42c7-9a23-ed1b669154a7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nxAKRSVmapWrpdol",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ivJJz3qhk_7i2X8iqBxQkL2Iih4kgugWJvnrGI2mLoQ",
+          "mode": "list",
+          "cachedResultName": "appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ivJJz3qhk_7i2X8iqBxQkL2Iih4kgugWJvnrGI2mLoQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ivJJz3qhk_7i2X8iqBxQkL2Iih4kgugWJvnrGI2mLoQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Switch').item.json.row_number }}",
+            "status": "sent"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_date",
+              "displayName": "appointment_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_time",
+              "displayName": "appointment_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "duration",
+              "displayName": "duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2144,
+        -16
+      ],
+      "id": "7ec51e29-7a38-47b0-bef8-3bc1009f0cda",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5oUSOxY12bC92ffE",
+          "name": "Google Sheets account"
+        }
+      }
     }
   ],
   "connections": {
@@ -148,6 +672,17 @@
         ]
       ]
     },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
@@ -165,6 +700,104 @@
           {
             "node": "AI Agent",
             "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message3": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
             "index": 0
           }
         ]
