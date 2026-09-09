@@ -355,7 +355,7 @@ This creates a complete **AI-powered appointment reminder system** with minimal 
 Built with **n8n, Google Sheets, Google Gemini, Gmail, and JavaScript**.
 
 ---
-<img width="1920" height="1080" alt="project done 2" src="https://github.com/user-attachments/assets/f6372c48-769e-4e49-be91-77e6605292b5" />
+
 
 
 
