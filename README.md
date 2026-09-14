@@ -361,6 +361,9 @@ Built with **n8n, Google Sheets, Google Gemini, Gmail, and JavaScript**.
 
 <img width="1920" height="1080" alt="project done" src="https://github.com/user-attachments/assets/e2fa2330-206f-4d2e-8d4c-de5e7476331e" />
 
+##Author
+Muneeb
+
 
 
 ## ⭐ Conclusion
